@@ -1,4 +1,25 @@
-// 函数：返回格式化的请求参数
+// 通用部分
+
+const renderRatingCard = info =>{
+    let raintgCard = document.createElement('div')
+    ratingCard.className = "rating-card"
+    ratingCard.innerHTML = `
+      <hr/>
+      <a href="${info.link}" target="_blank">
+        <span>${info.title}</span>
+        <br/>
+        <img class="cover" src="${info.url}"/>
+      </a>
+      <p>${info.date}  <b class="num">${info.score}</b>  <small class="grey">${info.vote}votes</small></p>
+      <p><small class="grey">${info.text[0]}: </small><small>${info.text[1]}</small><small class="grey">${info.text[2]}: </small></p>
+    `
+    document.querySelector('#panelInterestWrapper').appendChild(ratingCard)
+}
+
+// VNDB部分
+
+
+// 函数：返回格式化的VNDB请求参数
 const getRequest = title => {
   return {
     "filters": [
@@ -6,15 +27,34 @@ const getRequest = title => {
       "=",
       title
     ],
-    "fields": "alttitle,title,released,languages,image{url,sexual,violence},rating,votecount",
+    "fields": "alttitle,title,released,languages,image{url,sexual,violence},rating,votecount,length,length_minutes,length_votes",
     "sort": "searchrank",
     "reverse": false,
-    "results": 3,
+    "results": 1,
     "page": 1,
     "count": false,
     "compact_filters": false,
     "normalized_filters": false
   }
+}
+
+// 函数：格式化游玩时长数据
+const getLengthWord = length=>{
+  if (length == 1){
+    return "非常短"
+  }else if(length == 2){
+    return "短"
+  }else if(length == 3){
+    return "中等"
+  }else if(length == 4){
+    return "长"
+  }else{
+    return "非常长"
+  }
+}
+
+const getLengthHour = min=>{
+  return (min/60).toFixed(2)
 }
 
 // 获取VNDB数据
@@ -33,21 +73,18 @@ fetch('https://api.vndb.org/kana/vn', {
   })
   .then((data) => {
     let results = data.results
+    // 判断结果，添加DOM
     if(results.length>0){
-      let vndbCard = document.createElement('div')
-      vndbCard.className = "vndb-card"
-      vndbCard.innerHTML = `
-        <hr/>
-        <a href="https://vndb.org/${results[0].id}" target="_blank">
-          <span>${results[0].alttitle?results[0].alttitle:results[0].title}</span>
-          <br/>
-          <img class="cover" src="${results[0].image.url}"/>
-        </a>
-        <p>${results[0].released}  <b class="num">${results[0].rating}</b></p>
-      `
-      document.querySelector('#panelInterestWrapper').appendChild(vndbCard)
+      renderRatingCard({
+        link: 'https://vndb.org/'+results[0].id,
+        title: results[0].alttitle?results[0].alttitle:results[0].title,
+        url: results[0].image.url,
+        date: results[0].released,
+        score: results[0].rating/10,
+        vote: results[0].votecount,
+        info: ['平均游玩时长: ', getLengthHour(results[0].length_minutes)+'时('+getLengthWord(results[0].length)+')', results[0].length_votes]
+      })
     }
-    // 添加卡片到页面
   })
   .catch((error) => {
     console.log(error);

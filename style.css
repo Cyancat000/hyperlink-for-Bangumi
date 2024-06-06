@@ -1,14 +1,14 @@
-.vndb-card>a:hover>img{
+.rating-card>a:hover>img{
   display: block;
 }
 
-.vndb-card>a>img{
+.rating-card>a>img{
   margin-top: 16px;
   position: absolute;
   z-index: 1;
   display: none;
 }
 
-.vndb-card .num{
+.rating-card .num{
   color: #E800A4;
 }
