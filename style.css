@@ -1,0 +1,14 @@
+.vndb-card>a:hover>img{
+  display: block;
+}
+
+.vndb-card>a>img{
+  margin-top: 16px;
+  position: absolute;
+  z-index: 1;
+  display: none;
+}
+
+.vndb-card .num{
+  color: #E800A4;
+}
