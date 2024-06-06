@@ -1,7 +1,7 @@
 // 通用部分
 
 const renderRatingCard = info =>{
-    let raintgCard = document.createElement('div')
+    let ratingCard = document.createElement('div')
     ratingCard.className = "rating-card"
     ratingCard.innerHTML = `
       <hr/>
@@ -10,8 +10,8 @@ const renderRatingCard = info =>{
         <br/>
         <img class="cover" src="${info.url}"/>
       </a>
-      <p>${info.date}  <b class="num">${info.score}</b>  <small class="grey">${info.vote}votes</small></p>
-      <p><small class="grey">${info.text[0]}: </small><small>${info.text[1]}</small><small class="grey">${info.text[2]}: </small></p>
+      <p>${info.date}  <b class="num">${info.score}</b>  <small class="grey">${info.vote} votes</small></p>
+      <p><small class="grey">${info.text[0]}  </small><small>${info.text[1]} </small><small class="grey">${info.text[2]} </small></p>
     `
     document.querySelector('#panelInterestWrapper').appendChild(ratingCard)
 }
@@ -54,7 +54,7 @@ const getLengthWord = length=>{
 }
 
 const getLengthHour = min=>{
-  return (min/60).toFixed(2)
+  return (min/60).toFixed(2)/1
 }
 
 // 获取VNDB数据
@@ -73,16 +73,16 @@ fetch('https://api.vndb.org/kana/vn', {
   })
   .then((data) => {
     let results = data.results
-    // 判断结果，添加DOM
+    // 判断结果，渲染DOM
     if(results.length>0){
       renderRatingCard({
         link: 'https://vndb.org/'+results[0].id,
         title: results[0].alttitle?results[0].alttitle:results[0].title,
         url: results[0].image.url,
         date: results[0].released,
-        score: results[0].rating/10,
+        score: (results[0].rating/10).toFixed(2)/1,
         vote: results[0].votecount,
-        info: ['平均游玩时长: ', getLengthHour(results[0].length_minutes)+'时('+getLengthWord(results[0].length)+')', results[0].length_votes]
+        text: ['平均游玩时长: ', getLengthHour(results[0].length_minutes)+'Hours('+getLengthWord(results[0].length)+')', results[0].length_votes+' votes']
       })
     }
   })
