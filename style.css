@@ -2,13 +2,64 @@
   display: block;
 }
 
-.rating-card>a>img{
+.rating-card>a>.cover{
   margin-top: 16px;
   position: absolute;
   z-index: 1;
+  width: 240px;
   display: none;
+}
+
+.favicon{
+  vertical-align: sub;
+  border-radius: 2px;
+  width: 16px;
+}
+
+.rating-card .title{
+  display: block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .rating-card .num{
   color: #E800A4;
+}
+
+
+.rating-card .setting{
+  position: absolute;
+  transition-duration: 0.5s;
+  left: 240px;
+  cursor: pointer;
+  top: 4px;
+}
+
+
+.rating-card .setting:hover{
+  transform: rotate(90deg);
+}
+
+.rating-card .setting-card{
+  width: 120px;
+  border-radius: 4px;
+  border: 0.5px solid grey;
+  box-shadow: 1px 1px 4px grey;
+  padding: 4px 12px;
+  position: absolute;
+  right: -16px;
+  top: -26px;
+  display: none;
+}
+
+.rating-card .setting-card input{
+  position: relative;
+  top: 2px;
+}
+
+
+.rating-card{
+  margin-top: 10px;
+  position: relative;
 }
