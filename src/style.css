@@ -1,0 +1,8 @@
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+/* @import "tailwindcss/preflight.css" layer(base); */
+@import "tailwindcss/utilities.css" layer(utilities) ;
+
+@theme {
+  --shadow-base: rgba(0, 0, 0, 0.09) 0px 5px 10px 0px; 
+}
