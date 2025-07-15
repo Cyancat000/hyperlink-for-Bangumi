@@ -1,15 +1,15 @@
 <template>
-  <div class="rating-card mt-2! p-2! h-18! flex flex-col justify-between relative rounded-lg bg-white shadow-base">
+  <div class="z-1! hover:z-2! group rating-card mt-2! p-2! h-18! flex flex-col justify-between relative rounded-lg bg-white shadow-base  hover:scale-105 duration-500 border border-gray-200">
     <!-- 信息卡片 -->
      <template v-if="info.title">
        <a :href="info.link" target="_blank">
        <span class="title flex! gap-1">
-         <img v-show="config.showFavicon" class="w-4 h-4 rounded-xs" :src="info.icon"/>
+         <img v-if="config.showFavicon" class="w-4 h-4 rounded-xs" :src="info.icon"/>
          <span class="truncate">{{ info.title }}</span>
        </span>
-       <img class="w-60 mt-4! z-1 absolute hidden" :src="info.url"/>
+       <img class="w-60 absolute opacity-0 group-hover:opacity-100 rounded-sm  duration-500 pointer-events-none" :class="locationStyle" :src="info.url"/>
        </a>
-       <p>{{ info.date }}  <b class="num">{{ info.score}}</b>  <small class="grey">{{ info.vote }} votes</small></p>
+       <p>{{ info.date }}  <b class="text-[#E800A4]">{{ info.score}}</b>  <small class="grey">{{ info.vote }} votes</small></p>
        <p>
          <small class="grey">{{ info.text[0] }} </small>
          <small> {{ info.text[1] }} </small>
@@ -17,24 +17,25 @@
        </p>
      </template>
      <template  v-else>
+      <div class="h-4 w-full bg-gray-200 rounded-full animate-pulse"></div>
+      <div class="h-4 w-1/2 bg-gray-200 rounded-full mt-2 animate-pulse"></div>
+      <div class="h-4 w-1/3 bg-gray-200 rounded-full mt-2 animate-pulse"></div>
      </template>
-    <!-- 设置图标 -->
-    <img :src="settingIcon" alt="设置图标" class="setting absolute duration-500 top-1 left-60" @click="showSettingCard = !showSettingCard">
-    <!-- 设置卡片 -->
-     <config-card v-show="showSettingCard" :config="config" @change="handleConfigChange"></config-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { reactive, computed } from 'vue';
 import { reqVNDBData, reqMALData } from '../api/index.js';
-import ConfigCard from './ConfigCard.vue';
 
 
-
-import settingIcon from '../assets/setting.svg';
-
-const props = defineProps<{ subjectData: {type: string, name: string} }>();
+const props = defineProps<{ 
+  subjectData: {type: string, name: string},
+  config: {
+    showFavicon: boolean,
+    coverLocation: string
+  }
+  }>();
 
 const info = reactive({
   link: '',
@@ -47,11 +48,22 @@ const info = reactive({
   text: [] as string[],
 });
 
-let config = reactive({
-  showFavicon: true
+// 静态渲染数据
+
+// 计算属性
+const locationStyle = computed(() => {
+  switch (props.config.coverLocation) {
+    case 'left':
+      return '-left-2 top-0 -translate-x-full';
+    case 'right':
+      return '-right-2 top-0 translate-x-full';
+    case 'top':
+      return '-top-2 left-0 -translate-y-full';
+    case 'bottom':
+      return '-bottom-2 left-0 translate-y-full';
+  }
 })
 
-const showSettingCard = ref(false);
 
 // ===VNDB模块===
 
@@ -123,21 +135,8 @@ const renderMAL = () => {
   });
 }
 
-// ===缓存配置===
-const handleConfigChange = (newConfig: any) => {
-  localStorage.setItem('hyper-link-for-bangumi-config', JSON.stringify(newConfig));
-}
-
-const getConfig = () => {
-  const configStr = localStorage.getItem('hyper-link-for-bangumi-config');
-  if (configStr) {
-    const newConfig = JSON.parse(configStr);
-    Object.assign(config, newConfig);
-  }
-};
 
 // ===主函数===
-getConfig()
 if(props.subjectData.type === '游戏') {
   renderVNDB();
 } else if(props.subjectData.type === '动画') {
@@ -146,20 +145,4 @@ if(props.subjectData.type === '游戏') {
 </script>
 
 <style lang="scss" scoped>
-.rating-card>a:hover>img{
-  display: block;
-}
-
-.rating-card .num{
-  color: #E800A4;
-}
-
-
-
-.rating-card .setting:hover{
-  transform: rotate(90deg);
-}
-
-
-
 </style>
