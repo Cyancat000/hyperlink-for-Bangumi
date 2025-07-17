@@ -9,11 +9,11 @@
        </span>
        <img class="w-60 absolute opacity-0 group-hover:opacity-100 rounded-sm  duration-500 pointer-events-none" :class="locationStyle" :src="info.url"/>
        </a>
-       <p>{{ info.date }}  <b class="text-[#E800A4]">{{ info.score}}</b>  <small class="grey">{{ info.vote }} votes</small></p>
+       <p>{{ info.date }}  <b class="text-[#E800A4]">{{ info.score}}</b>  <small class="grey">{{ info.vote || info.favourites }} {{ info.vote ? 'votes' : 'favourites' }}</small></p>
        <p>
          <small class="grey">{{ info.text[0] }} </small>
          <small> {{ info.text[1] }} </small>
-         <small class="grey"> {{ info.text[2] }}</small>
+         <small class="grey">  {{ " " + info.text[2] }}</small>
        </p>
      </template>
      <template  v-else>
@@ -26,11 +26,14 @@
 
 <script setup lang="ts">
 import { reactive, computed } from 'vue';
-import { reqVNDBData, reqMALData } from '../api/index.js';
+import { reqVNDBData, reqMALData, reqAnilistData } from '../api/index.js';
+import { AnilistResults } from '../api/index.js';
+import { get } from 'http';
 
 
 const props = defineProps<{ 
-  subjectData: {type: string, name: string},
+  source: string,
+  name: string,
   config: {
     showFavicon: boolean,
     coverLocation: string
@@ -43,12 +46,11 @@ const info = reactive({
   title: '',
   url: '',
   date: '',
-  score: '',
+  score: '' as number | string,
   vote: '',
+  favourites: '' as number | string,
   text: [] as string[],
 });
-
-// 静态渲染数据
 
 // 计算属性
 const locationStyle = computed(() => {
@@ -65,14 +67,14 @@ const locationStyle = computed(() => {
 })
 
 
-// ===VNDB模块===
+// ===获取VNDB信息===
 
 /**
  * @description
  * 请求数据
  */
 const renderVNDB = () => {
-  const title = props.subjectData.name;
+  const title = props.name;
   reqVNDBData(title).then(res => {
     console.log(res);
     info.link = 'https://vndb.org/' + res.results[0].id;
@@ -88,7 +90,7 @@ const renderVNDB = () => {
 
 /**
  * @description 
- * 格式化游玩时长数据
+ * 格式化VNDB游玩时长数据
  */
 const getLengthWord = (length: number) => {
   switch (length) {
@@ -109,7 +111,7 @@ const getLengthWord = (length: number) => {
 
 /**
  * @description
- * 格式化时长
+ * 格式化VNDB时长
  */
 const getLengthHour = (min: number | null) => {
   if (min == null) {
@@ -119,10 +121,10 @@ const getLengthHour = (min: number | null) => {
   }
 }
 
-// ===MAL模块===
+// ===获取MAL信息===
 
 const renderMAL = () => {
-  const title = props.subjectData.name;
+  const title = props.name;
   reqMALData(title).then(res => {
     info.link = res.data[0].url;
     info.icon = 'https://myanimelist.net/favicon.ico';
@@ -135,12 +137,43 @@ const renderMAL = () => {
   });
 }
 
+// ===获取AniList信息===
+
+const renderAniList = () => {
+  const title = props.name;
+  reqAnilistData(title).then(res => {
+    info.link = 'https://anilist.co/anime/' + res.data.Media.id;
+    info.icon = 'https://anilist.co/favicon.ico';
+    info.title = res.data.Media.title.native;
+    info.url = res.data.Media.coverImage.large;
+    info.date = res.data.Media.startDate.year + '-' + res.data.Media.startDate.month + '-' + res.data.Media.startDate.day;
+    info.score = Number(res.data.Media.averageScore)/10;
+    info.favourites = res.data.Media.favourites;
+    info.text = [`AniList Anime ${getRatedByYear(res.data.Media.rankings).year} Ranked: `, '#' + getRatedByYear(res.data.Media.rankings).rank, ''];
+    console.log(res);
+  })
+}
+
+const getRatedByYear = (rankings: AnilistResults['data']['Media']['rankings']) => {
+  const yearRated = rankings.filter(ranking => ranking.type === "RATED" && ranking.year); // yearRated
+  return {
+    year: yearRated[0].year?.toString() || '',
+    rank: yearRated[0].rank
+  }
+}
+
 
 // ===主函数===
-if(props.subjectData.type === '游戏') {
-  renderVNDB();
-} else if(props.subjectData.type === '动画') {
-  renderMAL();
+switch (props.source) {
+  case 'VNDB':
+    renderVNDB();
+    break;
+  case 'MAL':
+    renderMAL();
+    break;
+  case 'AniList':
+    renderAniList();
+    break;
 }
 </script>
 

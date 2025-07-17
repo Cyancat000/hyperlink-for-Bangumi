@@ -1,13 +1,13 @@
 <template>
   <div
-    class="box-border border border-gray-200 w-60 absolute bg-white rounded-sm duration-5 flex flex-col gap-2 -translate-full -top-2 left-60 shadow-base px-2! py-2!">
+    class="box-border border border-gray-200 w-60 absolute bg-white rounded-sm duration-5 flex flex-col gap-2 -translate-full -top-2 left-60 shadow-base px-2! py-2! text-sm font-medium">
     <div class="flex w-full gap-1">
-      <span class="flex-1">展示图标</span>
-      <custom-switch class="flex-3" v-model="config.showFavicon" @change="handleChange"></custom-switch>
+      <span class="flex-3">展示图标</span>
+      <custom-switch class="flex-7" v-model="config.showFavicon" @change="handleChange"></custom-switch>
     </div>
     <div class="flex w-full gap-1">
-      <span class="flex-1">封面位置</span>
-      <custom-select class="flex-3" :options="coverLocationOptions" v-model="config.coverLocation"
+      <span class="flex-3">封面位置</span>
+      <custom-select class="flex-7" :options="coverLocationOptions" v-model="config.coverLocation"
         @change="handleChange"></custom-select>
     </div>
   </div>

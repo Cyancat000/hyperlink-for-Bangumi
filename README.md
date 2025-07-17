@@ -3,6 +3,28 @@
 ![example](example.webp)
 
 
+query($search: String)  {
+  Media(search: $search, type: ANIME) {
+    coverImage {
+      medium
+    }
+    averageScore
+    rankings {
+      rank
+      context
+      allTime
+      type
+      format
+      year
+    }
+    startDate {
+      day
+      year
+      month
+    }
+  }
+}
+
 ## Update
 
 `1.0`

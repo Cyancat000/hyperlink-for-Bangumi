@@ -1,9 +1,7 @@
 <template class="container">
      <div class="container relative">
       <!-- 评分卡片 -->
-      <rating-card :subjectData="subjectData" :config="config"/>
-      <rating-card :subjectData="subjectData" :config="config"/>
-      <rating-card :subjectData="subjectData" :config="config"/>
+      <rating-card v-for="source in sourceList" :source="source" :name="subjectName" :config="config"/>
       <!-- 设置图标 -->
       <img :src="settingIcon" alt="设置图标" class="setting absolute duration-500 top-1 left-60 hover:rotate-90" @click="showSettingCard = !showSettingCard">
       <!-- 设置卡片 -->
@@ -24,6 +22,32 @@ let config = reactive({
   coverLocation: 'left',
 })
 
+const sourceListByType = reactive({
+  game: ['VNDB'],
+  anime: ['MAL', 'AniList'],
+  // manga: ['AniListManga'],
+});
+
+const sourceList: string[] = reactive([])
+
+const subjectName = ref(document.querySelector('.nameSingle>a')?.textContent?? '')
+
+switch(document.querySelector('#navMenuNeue a.focus')?.textContent?? ''){
+  case '游戏': 
+    sourceList.push(...sourceListByType.game)
+    break;
+  case '动画': 
+    sourceList.push(...sourceListByType.anime)
+    break;
+  case '书籍':
+    if(document.querySelector('.nameSingle>.grey')?.textContent?.includes('漫画')) {
+      // console.log('是漫画!!')
+      // sourceList.push(...sourceListByType.manga)
+    }
+    break;
+}
+
+
 // ===缓存配置===
 const handleConfigChange = (newConfig: any) => {
   console.log(config, "当前config")
@@ -39,18 +63,9 @@ const getConfig = () => {
 };
 
 
-getConfig()
 
-/**
- * @description
- * 条目数据  
- * type: e.g. 游戏  
- * name: e.g. SWAN SONG  
- */
-const subjectData = reactive({
-  type: document.querySelector('#navMenuNeue a.focus')?.textContent?? '',
-  name: document.querySelector('.nameSingle>a')?.textContent?? '',
-});
+
+getConfig()
 
 </script>
 
