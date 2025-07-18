@@ -11,7 +11,7 @@
        </span>
        <img class="w-60 absolute opacity-0 group-hover:opacity-100 rounded-sm  duration-500 pointer-events-none" :class="locationStyle" :src="info.url"/>
        </a>
-       <p>{{ info.date || 'No Date Data' }}  <b class="text-[#E800A4]">{{ info.score || '- '}}</b> 
+       <p>{{ info.date || 'No Date Data' }}  <b class="text-[#E800A4] mr-1">{{ info.score || '- '}}</b> 
         <small class="grey">{{ counts || 'No' }} {{ info.countsType }}</small></p>
        <p>
          <small class="grey">{{ info.text[0] }} </small>
