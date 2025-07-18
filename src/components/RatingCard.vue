@@ -1,5 +1,7 @@
 <template>
-  <div class="z-1! hover:z-2! group rating-card mt-2! p-2! h-18! flex flex-col justify-between relative rounded-lg bg-white shadow-base  hover:scale-105 duration-500 border border-gray-200">
+  <div
+    v-if="config.sourceDisplay[type][index].value"
+    class="z-1! hover:z-2! group rating-card mt-2! p-2! h-18! flex flex-col justify-between relative rounded-lg bg-white shadow-base  hover:scale-105 duration-500 border border-gray-200">
     <!-- 信息卡片 -->
      <template v-if="info.title">
        <a :href="info.link" target="_blank">
@@ -9,12 +11,17 @@
        </span>
        <img class="w-60 absolute opacity-0 group-hover:opacity-100 rounded-sm  duration-500 pointer-events-none" :class="locationStyle" :src="info.url"/>
        </a>
-       <p>{{ info.date }}  <b class="text-[#E800A4]">{{ info.score}}</b>  <small class="grey">{{ info.vote || info.favourites }} {{ info.vote ? 'votes' : 'favourites' }}</small></p>
+       <p>{{ info.date || 'No Date Data' }}  <b class="text-[#E800A4]">{{ info.score || '- '}}</b> 
+        <small class="grey">{{ counts || 'No' }} {{ info.countsType }}</small></p>
        <p>
          <small class="grey">{{ info.text[0] }} </small>
          <small> {{ info.text[1] }} </small>
          <small class="grey">  {{ " " + info.text[2] }}</small>
        </p>
+     </template>
+     <template  v-else-if="empty">
+      <img :src="emptyIcon" alt="暂无数据" class="w-12 mx-auto block relative top-0 fill-green-500!">
+      <span class="inline-block text-gray-500 mx-auto fs-12 flex-1">没有搜寻到任何条目喵~</span>
      </template>
      <template  v-else>
       <div class="h-4 w-full bg-gray-200 rounded-full animate-pulse"></div>
@@ -25,10 +32,11 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { reqVNDBData, reqMALData, reqAnilistData } from '../api/index.js';
 import { AnilistResults } from '../api/index.js';
-import { get } from 'http';
+import emptyIcon from '../assets/cat.svg';
+
 
 
 const props = defineProps<{ 
@@ -36,23 +44,41 @@ const props = defineProps<{
   name: string,
   config: {
     showFavicon: boolean,
-    coverLocation: string
-  }
+    coverLocation: string,
+    sourceDisplay: {
+      game: {value: Boolean, label: string}[],
+      anime: {value: Boolean, label: string}[],
+      manga: {value: Boolean, label: string}[],
+    }
+  },
+  index: number,
+  type: 'game' | 'anime' | 'manga'
   }>();
 
-const info = reactive({
+
+
+
+const info = reactive<Info>({
   link: '',
   icon: '',
   title: '',
   url: '',
   date: '',
-  score: '' as number | string,
-  vote: '',
-  favourites: '' as number | string,
-  text: [] as string[],
+  score: '',
+  votes: '',
+  favourites: '',
+  text: [],
+  countsType: 'votes'
 });
 
-// 计算属性
+const counts = computed(() => {
+  const key = info.countsType
+  return info[key];
+})
+
+let empty = ref(false);
+
+// Tailwind原子类：封面位置
 const locationStyle = computed(() => {
   switch (props.config.coverLocation) {
     case 'left':
@@ -77,13 +103,17 @@ const renderVNDB = () => {
   const title = props.name;
   reqVNDBData(title).then(res => {
     console.log(res);
+    if(res.results.length === 0) {
+      empty.value = true;
+      return;
+    }
     info.link = 'https://vndb.org/' + res.results[0].id;
     info.icon = 'https://vndb.org/favicon.ico';
     info.title = res.results[0].alttitle || res.results[0].title;
     info.url = res.results[0].image.url;
     info.date = res.results[0].released;
     info.score = (res.results[0].rating / 10).toFixed(2);
-    info.vote = res.results[0].votecount;
+    info.votes = res.results[0].votecount;
     info.text = ['平均游玩时长: ', getLengthHour(res.results[0].length_minutes) + '(' + getLengthWord(res.results[0].length) + ')', res.results[0].length_votes + 'votes'];
   });
 }
@@ -123,43 +153,77 @@ const getLengthHour = (min: number | null) => {
 
 // ===获取MAL信息===
 
-const renderMAL = () => {
+const renderMAL = (type: string = 'Anime') => {
   const title = props.name;
-  reqMALData(title).then(res => {
+  reqMALData(title, type).then(res => {
+    console.log('MALInfo', res, info);
     info.link = res.data[0].url;
     info.icon = 'https://myanimelist.net/favicon.ico';
     info.title = res.data[0].title_japanese;
     info.url = res.data[0].images.jpg.large_image_url;
-    info.date = res.data[0].aired.from.slice(0, 10);
+    if(type === 'Manga') {
+      if(res.data[0].published.from){
+        info.date = res.data[0].published.from.slice(0, 10);
+      }else{
+        info.date = ''
+      }
+    }else{
+      if(res.data[0].aired.from){
+        info.date = res.data[0].aired.from.slice(0, 10);
+      }else{
+        console.log(123)
+        info.date = ''
+      }
+    }
     info.score = res.data[0].score;
-    info.vote = res.data[0].scored_by;
-    info.text = ['MyAnimeList Anime Ranked: ', '#' + res.data[0].rank, ''];
+    info.votes = res.data[0].scored_by;
+    if(res.data[0].rank == null) {
+      info.text = [`No MAL ${type} Ranked`, '', ''];
+    }else{
+      info.text = [`MyAnimeList ${type} Ranked: `, '#' + res.data[0].rank, ''];
+    }
+  }).catch(() => {
+    empty.value = true;
   });
 }
 
 // ===获取AniList信息===
 
-const renderAniList = () => {
+const renderAniList = (type: string = 'Anime') => {
   const title = props.name;
-  reqAnilistData(title).then(res => {
+  reqAnilistData(title, type).then(res => {
     info.link = 'https://anilist.co/anime/' + res.data.Media.id;
     info.icon = 'https://anilist.co/favicon.ico';
     info.title = res.data.Media.title.native;
     info.url = res.data.Media.coverImage.large;
-    info.date = res.data.Media.startDate.year + '-' + res.data.Media.startDate.month + '-' + res.data.Media.startDate.day;
+    if(res.data.Media.startDate.year === null){
+      info.date = 'No Date Data'
+    }else{
+      info.date = res.data.Media.startDate.year + '-' + res.data.Media.startDate.month + '-' + res.data.Media.startDate.day;
+    }
     info.score = Number(res.data.Media.averageScore)/10;
     info.favourites = res.data.Media.favourites;
-    info.text = [`AniList Anime ${getRatedByYear(res.data.Media.rankings).year} Ranked: `, '#' + getRatedByYear(res.data.Media.rankings).rank, ''];
+    info.countsType = 'favourites';
+    const ranking = getRatedByYear(res.data.Media.rankings);
+    if(ranking === null) {
+      info.text = [`No AniList ${type} Ranked`, '', ''];
+    }else if(ranking.allTime) {
+      info.text = [`AniList ${type} Ranked: `, '#' + ranking.rank, ''];
+    }else{
+      info.text = [`AniList ${type} ${ranking.year} Ranked: `, '#' + ranking.rank, ''];
+    }
     console.log(res);
+  }).catch(() => {
+    empty.value = true;
   })
 }
 
 const getRatedByYear = (rankings: AnilistResults['data']['Media']['rankings']) => {
-  const yearRated = rankings.filter(ranking => ranking.type === "RATED" && ranking.year); // yearRated
-  return {
-    year: yearRated[0].year?.toString() || '',
-    rank: yearRated[0].rank
+  const yearRated = rankings.filter(ranking => ranking.type === "RATED" && !ranking.allTime) || rankings.filter(ranking => ranking.type === "RATED" && ranking.allTime); // yearRated
+  if (yearRated.length === 0) {
+    return null;
   }
+  return yearRated[0]
 }
 
 
@@ -173,6 +237,14 @@ switch (props.source) {
     break;
   case 'AniList':
     renderAniList();
+    break;
+  case 'AniListManga':
+    renderAniList('Manga');
+    break;
+  case 'MALManga':
+    renderMAL('Manga');
+    break;
+  default:
     break;
 }
 </script>
