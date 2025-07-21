@@ -19,9 +19,13 @@
 ```
 npm run serve
 ```
-编译脚本文件
+编译油猴脚本文件
 ```
 npm run build
+```
+编译独立JS脚本文件(For 超合金组件)
+```
+npm run build:standalone
 ```
 
 ## Update

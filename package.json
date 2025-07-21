@@ -6,18 +6,18 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:standalone": "cross-env BUILD_TARGET=standalone vite build",
     "preview": "vue-tsc -b && vite preview"
   },
   "dependencies": {
-    "@headlessui/vue": "^1.7.23",
     "@tailwindcss/vite": "^4.1.11",
     "@types/node": "^24.0.13",
     "path": "^0.12.7",
-    "vue": "^3.5.13",
-    "vue-shadow-dom": "^4.2.0"
+    "vue": "^3.5.13"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
+    "cross-env": "^7.0.3",
     "sass": "^1.89.2",
     "terser": "^5.43.1",
     "typescript": "^5.7.2",
