@@ -5,7 +5,7 @@
 ![示例](./docs/images/example.webp)
 ![示例](./docs/images/example2.webp)
 
-## Tech Stack
+## Links
 
 - [Vite](https://vitejs.dev/) - Modern development server
 - [Vue 3](https://vuejs.org/) - The Progressive JavaScript Framework
@@ -14,7 +14,7 @@
 - [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework for rapidly building custom user interfaces
 - [Vite Plugin Monkey](https://github.com/lisonge/vite-plugin-monkey) - A vite plugin server and build your.user.js for userscript engine like Tampermonkey, Violentmonkey, Greasemonkey, ScriptCat
 
-## Get Start
+## Get Started
 运行开发服务器
 ```
 npm run serve
