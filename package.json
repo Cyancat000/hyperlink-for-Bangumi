@@ -18,7 +18,6 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
-    "naive-ui": "^2.42.0",
     "sass": "^1.89.2",
     "terser": "^5.43.1",
     "typescript": "^5.7.2",
