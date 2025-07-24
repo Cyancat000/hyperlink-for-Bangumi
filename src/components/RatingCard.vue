@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="config.sourceDisplay[type][index].value"
-    class="z-1! hover:z-2! group rating-card mt-2! p-2! h-18! flex flex-col justify-between relative rounded-lg bg-white shadow-base  hover:scale-105 duration-500 border border-gray-200">
+    class="z-1! hover:z-2! group rating-card mt-2! p-2! h-18! flex flex-col justify-between relative rounded-lg bg-white dark:bg-neutral-800 shadow-base  hover:scale-105 duration-500 border border-gray-200 dark:border-neutral-700">
     <!-- 信息卡片 -->
      <template v-if="info.title">
        <a :href="info.link" target="_blank">

@@ -7,8 +7,8 @@
       @change="handleChange"
       :class="{
         'block w-20 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md': true,
-        'bg-gray-50 cursor-not-allowed opacity-75': disabled,
-        'bg-white border': !disabled,
+        'bg-gray-50 dark:bg-neutral-600 cursor-not-allowed opacity-75': disabled,
+        'bg-white dark:bg-neutral-800 border': !disabled,
       }"
     >
       <option v-if="placeholder" value="" disabled selected>{{ placeholder }}</option>

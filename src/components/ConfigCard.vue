@@ -1,6 +1,6 @@
 <template>
   <div
-    class="box-border border border-gray-200 w-60 absolute z-4 bg-white rounded-sm duration-5 flex flex-col gap-2 -translate-full -top-2 left-60 shadow-base px-2! py-2! text-sm font-medium">
+    class="box-border border border-gray-200 dark:border-neutral-700 w-60 absolute z-4 bg-white dark:bg-neutral-800 rounded-sm duration-5 flex flex-col gap-2 -translate-full -top-2 left-60 shadow-base px-2! py-2! text-sm font-medium">
     <div class="flex w-full gap-1">
       <span class="flex-3">展示图标</span>
       <custom-switch class="flex-7" v-model="config.showFavicon" @change="handleChange"></custom-switch>
